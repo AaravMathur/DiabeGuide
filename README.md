@@ -60,7 +60,7 @@ The project uses a `.env` file to manage secret keys and configuration.
 ### 6. Run the Application
 Once the setup is complete, you can run the Flask application.
 ```bash
-flask --app diabeGuide/app.py run
+python -m flask --app diabeGuide/app.py run
 ```
 The application will be available at `http://127.0.0.1:5000`.
 
