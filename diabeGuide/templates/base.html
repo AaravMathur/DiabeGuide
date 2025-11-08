@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DiabeGuide - Smart Diabetes Assistant</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>DiabeGuide</h1>
+            <nav class="tabs">
+                {% if current_user.is_authenticated %}
+                {% if request.endpoint != 'welcome.welcome' %}
+                <a href="{{ url_for('dashboard.dashboard') }}" class="tab-link {{ 'active' if request.endpoint == 'dashboard.dashboard' else '' }}">Dashboard</a>
+                <a href="{{ url_for('about_bp.about') }}" class="tab-link {{ 'active' if request.endpoint == 'about_bp.about' else '' }}">About Diabetes</a>
+                <a href="{{ url_for('tracker.tracker') }}" class="tab-link {{ 'active' if request.endpoint == 'tracker.tracker' else '' }}">Tracker</a>
+                <a href="{{ url_for('chatbot.chatbot') }}" class="tab-link {{ 'active' if request.endpoint == 'chatbot.chatbot' else '' }}">Chatbot</a>
+                <a href="{{ url_for('emergency.emergency') }}" class="tab-link {{ 'active' if request.endpoint == 'emergency.emergency' else '' }}">Emergency</a>
+                <a href="{{ url_for('profile.profile') }}" class="tab-link {{ 'active' if request.endpoint == 'profile.profile' else '' }}">Profile</a>
+                {% endif %}
+                <a href="{{ url_for('auth.logout') }}" class="tab-link logout-link">Logout</a>
+                {% else %}
+                <a href="{{ url_for('auth.login') }}" class="tab-link {{ 'active' if request.endpoint == 'auth.login' else '' }}">Login</a>
+                <a href="{{ url_for('auth.signup') }}" class="tab-link {{ 'active' if request.endpoint == 'auth.signup' else '' }}">Sign Up</a>
+                {% endif %}
+            </nav>
+        </header>
+
+        <main>
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    <ul class="flashes">
+                        {% for category, message in messages %}
+                            <li class="{{ category }}">{{ message }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            {% endwith %}
+            {% block content %}{% endblock %}
+        </main>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="/static/js/main.js"></script>    <script src="/static/js/dashboard.js"></script>
+    <script src="/static/js/tracker.js"></script>
+    <script src="/static/js/chatbot.js"></script>
+    <script src="/static/js/emergency.js"></script>
+</body>
+</html>

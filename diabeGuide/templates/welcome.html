@@ -1,0 +1,279 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="welcome-container">
+    <div class="welcome-card">
+        <div class="welcome-header">
+            <div class="welcome-icon">🎉</div>
+            <h1>Welcome to DiabeGuide!</h1>
+            <p class="welcome-subtitle">We're excited to have you here! Let's get started by setting up your profile.</p>
+        </div>
+        
+        <div class="welcome-content">
+            <div class="welcome-info">
+                <h2>Complete Your Profile</h2>
+                <p>To provide you with personalized diabetes management assistance, we need some basic information about you.</p>
+                <div class="info-items">
+                    <div class="info-item">
+                        <span class="info-icon">⚖️</span>
+                        <span>Weight helps us track your progress</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-icon">📏</span>
+                        <span>Height helps calculate your BMI</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-icon">🎂</span>
+                        <span>Age helps personalize recommendations</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-icon">🏥</span>
+                        <span>Diabetes type helps customize your care plan</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="welcome-form">
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        <ul class="flashes">
+                            {% for category, message in messages %}
+                                <li class="{{ category }}">{{ message }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                {% endwith %}
+                
+                <form method="POST" action="{{ url_for('welcome.welcome') }}" class="profile-form">
+                    <div class="form-group">
+                        <label for="weight">Weight (kg) *</label>
+                        <input type="number" id="weight" name="weight" value="{{ user.weight or '' }}" step="0.1" placeholder="Enter your weight" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="height">Height (cm) *</label>
+                        <input type="number" id="height" name="height" value="{{ user.height or '' }}" step="0.1" placeholder="Enter your height" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="age">Age *</label>
+                        <input type="number" id="age" name="age" value="{{ user.age or '' }}" placeholder="Enter your age" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="diabetes_type">Diabetes Type *</label>
+                        <select id="diabetes_type" name="diabetes_type" required>
+                            <option value="">Select Type</option>
+                            <option value="Type 1" {% if user.diabetes_type == 'Type 1' %}selected{% endif %}>Type 1</option>
+                            <option value="Type 2" {% if user.diabetes_type == 'Type 2' %}selected{% endif %}>Type 2</option>
+                            <option value="Gestational" {% if user.diabetes_type == 'Gestational' %}selected{% endif %}>Gestational</option>
+                            <option value="Other" {% if user.diabetes_type == 'Other' %}selected{% endif %}>Other</option>
+                        </select>
+                    </div>
+                    
+                    <button type="submit" class="welcome-submit-btn">
+                        <span>Complete Setup</span>
+                        <span class="btn-arrow">→</span>
+                    </button>
+                </form>
+            </div>
+        </div>
+        
+        <div class="welcome-footer">
+            <p>Don't worry, you can update this information anytime from your profile settings.</p>
+        </div>
+    </div>
+</div>
+
+<style>
+.welcome-container {
+    min-height: calc(100vh - 200px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--spacing-lg);
+    background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 50%, #f0f9ff 100%);
+}
+
+.welcome-card {
+    max-width: 900px;
+    width: 100%;
+    background: var(--bg-secondary);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-xl);
+    padding: var(--spacing-xl);
+    animation: fadeInUp 0.6s ease-out;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.welcome-header {
+    text-align: center;
+    margin-bottom: var(--spacing-xl);
+    padding-bottom: var(--spacing-lg);
+    border-bottom: 2px solid var(--border-light);
+}
+
+.welcome-icon {
+    font-size: 4rem;
+    margin-bottom: var(--spacing-md);
+    animation: bounce 2s infinite;
+}
+
+@keyframes bounce {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+.welcome-header h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: var(--spacing-sm);
+}
+
+.welcome-subtitle {
+    font-size: 1.1rem;
+    color: var(--text-secondary);
+    margin-top: var(--spacing-sm);
+}
+
+.welcome-content {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--spacing-xl);
+    margin-bottom: var(--spacing-lg);
+}
+
+.welcome-info h2 {
+    font-size: 1.5rem;
+    color: var(--text-primary);
+    margin-bottom: var(--spacing-md);
+}
+
+.welcome-info p {
+    color: var(--text-secondary);
+    margin-bottom: var(--spacing-lg);
+    line-height: 1.6;
+}
+
+.info-items {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+}
+
+.info-item {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-sm);
+    background: var(--bg-tertiary);
+    border-radius: var(--radius-md);
+    transition: all 0.3s ease;
+}
+
+.info-item:hover {
+    background: linear-gradient(135deg, var(--primary-light) 0%, var(--primary-color) 100%);
+    color: white;
+    transform: translateX(5px);
+}
+
+.info-icon {
+    font-size: 1.5rem;
+}
+
+.welcome-form {
+    background: var(--bg-tertiary);
+    padding: var(--spacing-lg);
+    border-radius: var(--radius-lg);
+    border: 2px solid var(--border-light);
+}
+
+.profile-form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+}
+
+.welcome-submit-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-sm);
+    padding: 1.25rem 2rem;
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+    color: white;
+    border: none;
+    border-radius: var(--radius-lg);
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: var(--shadow-md);
+    margin-top: var(--spacing-md);
+}
+
+.welcome-submit-btn:hover {
+    background: linear-gradient(135deg, var(--primary-light) 0%, var(--primary-color) 100%);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+}
+
+.welcome-submit-btn:active {
+    transform: translateY(0);
+}
+
+.btn-arrow {
+    font-size: 1.2rem;
+    transition: transform 0.3s ease;
+}
+
+.welcome-submit-btn:hover .btn-arrow {
+    transform: translateX(5px);
+}
+
+.welcome-footer {
+    text-align: center;
+    padding-top: var(--spacing-lg);
+    border-top: 2px solid var(--border-light);
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+}
+
+@media (max-width: 768px) {
+    .welcome-content {
+        grid-template-columns: 1fr;
+        gap: var(--spacing-lg);
+    }
+    
+    .welcome-header h1 {
+        font-size: 2rem;
+    }
+    
+    .welcome-card {
+        padding: var(--spacing-md);
+    }
+    
+    .welcome-icon {
+        font-size: 3rem;
+    }
+}
+</style>
+{% endblock %}
+

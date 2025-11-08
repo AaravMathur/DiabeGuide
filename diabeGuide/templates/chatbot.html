@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block content %}
+<div id="Chatbot" class="tab-content active">
+    <h2>Chatbot</h2>
+    <div id="chat-history"></div>
+    <div id="chat-window-container">
+        <div id="chat-window">
+            <!-- Welcome message will be loaded immediately without animation -->
+        </div>
+        <div class="chat-controls">
+        </div>
+    </div>
+    <div class="quick-commands">
+        <div class="dropdown">
+            <button class="dropbtn">Quick Commands</button>
+            <div class="dropdown-content">
+                <a href="#" class="quick-cmd">What should I eat?</a>
+                <a href="#" class="quick-cmd">Suggest an exercise</a>
+                <a href="#" class="quick-cmd">Suggest a drink</a>
+            </div>
+        </div>
+        <button id="clear-chat-btn" class="quick-cmd">Clear Chat</button>
+        <button id="history-btn" class="quick-cmd">History</button>
+    </div>
+    <div class="chat-input-container">
+        <div class="stop-generating-container" id="stop-generating-container" style="display: none;">
+            <button id="stop-generating-btn" class="stop-generating-btn">
+                <span class="stop-icon">⏹</span>
+                <span class="stop-text">Stop generating</span>
+            </button>
+        </div>
+        <div class="chat-input">
+            <input type="text" id="user-input" placeholder="Type your message here...">
+            <button id="send-btn">Send</button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script src="/static/js/chatbot.js"></script>
+{% endblock %}

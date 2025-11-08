@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block content %}
+<div id="Dashboard" class="tab-content active">
+    <h2>Dashboard</h2>
+    <div class="charts">
+        <h3>Sugar Trends</h3>
+        <canvas id="sugar-chart"></canvas>
+    </div>
+    <button id="download-btn">Download Data</button>
+</div>
+{% endblock %}
+{% block scripts %}
+<script src="/static/js/dashboard.js"></script>
+{% endblock %}

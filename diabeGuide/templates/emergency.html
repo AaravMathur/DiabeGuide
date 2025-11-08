@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block content %}
+<div id="Emergency" class="tab-content active">
+    <h2>Emergency</h2>
+    <p>Get quick information on symptoms.</p>
+    <button class="emergency-btn" data-symptom="high">Symptoms of High Sugar</button>
+    <button class="emergency-btn" data-symptom="low">Symptoms of Low Sugar</button>
+</div>
+{% endblock %}
+{% block scripts %}
+<script src="/static/js/emergency.js"></script>
+{% endblock %}

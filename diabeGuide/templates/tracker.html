@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block content %}
+<div id="Tracker" class="tab-content active">
+    <h2>Tracker</h2>
+    <div class="input-form">
+        <input type="number" id="sugar-input" placeholder="Sugar Level (mg/dL)">
+        <input type="text" id="note-input" placeholder="Note">
+        <input type="month" id="month-year-input">
+        <button id="log-btn">Log Data</button>
+        <button id="clear-data-btn">Clear Data</button>
+    </div>
+    <div id="tracker-log"></div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script src="/static/js/tracker.js"></script>
+{% endblock %}

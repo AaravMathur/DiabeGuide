@@ -1,0 +1,4 @@
+pip install -r diabeGuide/requirements.txt
+source venv/bin/activate
+python3 run.py
+export FLASK_APP=diabeGuide.app && flask run --port 5000 
