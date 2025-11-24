@@ -826,6 +826,12 @@ button:active, .btn:active {
    Responsive Design
    ======================================== */
 
+/* General rule for responsive images and media */
+img, video, iframe {
+    max-width: 100%;
+    height: auto;
+}
+
 @media (max-width: 768px) {
     header {
         flex-direction: column;
@@ -836,6 +842,7 @@ button:active, .btn:active {
     .tabs {
         justify-content: center;
         width: 100%;
+        gap: var(--spacing-xs); /* Tighter gap for tabs */
     }
 
     .tab-link {
@@ -868,28 +875,18 @@ button:active, .btn:active {
     }
 
     .bot-message p, .user-message p {
-        max-width: 85%;
+        max-width: 90%; /* Keep this as a cap for very long messages */
+        width: fit-content; /* Make it shrink-wrap its content */
+        width: -moz-fit-content; /* Firefox compatibility */
     }
 
-    .chat-controls {
-        right: 10px;
-        top: 10px;
-        gap: 6px;
+    .quick-commands {
+        justify-content: center;
     }
 
-    .control-btn {
-        width: 35px;
-        height: 35px;
-        font-size: 1rem;
-    }
-
-    .stop-generating-btn {
-        padding: 0.625rem 1.25rem;
-        font-size: 0.9rem;
-    }
-
-    .stop-text {
-        font-size: 0.85rem;
+    .auth-container, .profile-container {
+        padding: var(--spacing-lg);
+        margin: var(--spacing-md) auto;
     }
 }
 
@@ -898,17 +895,44 @@ button:active, .btn:active {
         padding: var(--spacing-sm);
     }
 
+    header {
+        padding: var(--spacing-md);
+    }
+
     header h1 {
         font-size: 1.5rem;
     }
 
+    .tabs {
+        flex-direction: column;
+        align-items: stretch; /* Make tabs full-width */
+        gap: var(--spacing-xs);
+    }
+
+    .tab-link {
+        text-align: center; /* Center text in full-width tabs */
+    }
+
+    .tab-content {
+        padding: var(--spacing-sm);
+    }
+    
     .tab-content h2 {
         font-size: 1.5rem;
     }
 
     .auth-container, .profile-container {
         padding: var(--spacing-md);
-        margin: var(--spacing-md) auto;
+        box-shadow: none; /* Less emphasis on containers */
+        border: none;
+        background: transparent;
+    }
+
+    .bot-message p, .user-message p {
+        max-width: 95%;
+        width: fit-content; /* Make it shrink-wrap its content */
+        width: -moz-fit-content; /* Firefox compatibility */
+        font-size: 0.95rem;
     }
 }
 
