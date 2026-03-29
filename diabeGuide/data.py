@@ -69,7 +69,7 @@ class User(UserMixin):
         return weight_ok and height_ok and age_ok and diabetes_type_ok
 
 def get_user_by_id(user_id):
-    if not users_col: return None
+    if users_col is None: return None
     try:
         user_data = users_col.find_one({"_id": ObjectId(user_id)})
         if user_data:
@@ -89,7 +89,7 @@ def get_user_by_id(user_id):
     return None
 
 def get_user_by_username(username):
-    if not users_col: return None
+    if users_col is None: return None
     user_data = users_col.find_one({"username": username})
     if user_data:
         return User(
@@ -106,7 +106,7 @@ def get_user_by_username(username):
     return None
 
 def get_user_by_email(email):
-    if not users_col: return None
+    if users_col is None: return None
     user_data = users_col.find_one({"email": email})
     if user_data:
         return User(
@@ -167,18 +167,18 @@ def reload_users():
 # --- Profile Updates ---
 # We need a way to update user fields in MongoDB
 def update_user_profile(user_id, profile_data):
-    if not users_col: return False
+    if users_col is None: return False
     users_col.update_one({"_id": ObjectId(user_id)}, {"$set": profile_data})
     return True
 
 # --- User-specific Data Loading ---
 def load_user_data(user_id):
-    if not tracker_col: return {}
+    if tracker_col is None: return {}
     data = tracker_col.find_one({"user_id": str(user_id)})
     return data.get('data', {}) if data else {}
 
 def save_user_data(user_id, data):
-    if not tracker_col: return
+    if tracker_col is None: return
     tracker_col.update_one(
         {"user_id": str(user_id)},
         {"$set": {"data": data}},
@@ -186,12 +186,12 @@ def save_user_data(user_id, data):
     )
 
 def load_user_archived_chat_history(user_id):
-    if not chat_col: return []
+    if chat_col is None: return []
     data = chat_col.find_one({"user_id": str(user_id)})
     return data.get('history', []) if data else []
 
 def save_user_archived_chat_history(user_id, history):
-    if not chat_col: return
+    if chat_col is None: return
     chat_col.update_one(
         {"user_id": str(user_id)},
         {"$set": {"history": history}},
