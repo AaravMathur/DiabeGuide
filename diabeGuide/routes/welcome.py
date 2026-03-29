@@ -1,14 +1,13 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash
 from flask_login import login_required, current_user
-from ..data import save_users, reload_users, get_user_by_id
+from ..data import get_user_by_id
 
 welcome_bp = Blueprint('welcome', __name__)
 
 @welcome_bp.route('/welcome', methods=['GET', 'POST'])
 @login_required
 def welcome():
-    # Reload user data to ensure we have the latest profile information
-    reload_users()
+    # Reloading not needed as MongoDB is always fresh
     user = get_user_by_id(current_user.id)
     
     if not user:
@@ -32,7 +31,7 @@ def welcome():
         current_user.age = user.age
         current_user.diabetes_type = user.diabetes_type
         
-        save_users()
+        # save_users() # Removed as User class handles DB updates
         
         # Check if profile is now complete
         if user.is_profile_complete():

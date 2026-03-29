@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, redirect, url_for, flash, request, session, jsonify
 from flask_login import login_user, logout_user, login_required, current_user
-from ..data import get_user_by_username, create_user, get_user_by_id, reload_users, get_user_by_email, get_user_by_username_or_email
+from ..data import get_user_by_username, create_user, get_user_by_id, get_user_by_email, get_user_by_username_or_email
 from ..utils.email_utils import generate_otp, send_otp_email
 import re
 from datetime import datetime, timedelta
@@ -20,7 +20,7 @@ def is_valid_email(email):
 from flask import Blueprint, render_template, redirect, url_for, flash, request, session, jsonify
 from flask_login import login_user, logout_user, login_required, current_user
 from werkzeug.security import generate_password_hash
-from ..data import get_user_by_username, create_user, get_user_by_id, reload_users, get_user_by_email, get_user_by_username_or_email
+from ..data import get_user_by_username, create_user, get_user_by_id, get_user_by_email, get_user_by_username_or_email
 from ..utils.email_utils import generate_otp, send_otp_email
 import re
 from datetime import datetime, timedelta
@@ -53,7 +53,7 @@ def signup():
                 return render_template('signup.html', email=email, username=username, show_otp=True)
             
             if entered_otp == stored_otp:
-                reload_users()
+                # reload_users()
                 
                 # Final check for username/email existence
                 if get_user_by_username(username):
@@ -67,8 +67,8 @@ def signup():
                 new_user = create_user(username, password_hash, email=email)
                 if new_user:
                     new_user.email_verified = True
-                    from ..data import save_users
-                    save_users()
+                    # from ..data import save_users
+                    # save_users()
                     
                     # Log in the new user
                     login_user(new_user, remember=True)
@@ -99,7 +99,7 @@ def signup():
                 flash('Please enter a valid email address.', 'danger')
                 return render_template('signup.html', username=username, email=email, show_otp=False)
             
-            reload_users()
+            # reload_users()
             if get_user_by_username(username):
                 flash('Username already exists.', 'danger')
                 return render_template('signup.html', email=email, show_otp=False)
@@ -153,8 +153,8 @@ def login():
         identifier = request.form.get('username_or_email')  # Changed field name
         password = request.form.get('password')
 
-        # Reload users to get latest data
-        reload_users()
+        # Reload users not needed for MongoDB
+        # reload_users()
         
         # Try to get user by username or email
         user = get_user_by_username_or_email(identifier)
