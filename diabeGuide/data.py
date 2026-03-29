@@ -105,8 +105,11 @@ def save_users():
             'diabetes_type': user.diabetes_type,
             'email_verified': user.email_verified
         }
-    with open(USERS_FILE, 'w') as f:
-        json.dump(users_data, f, indent=4)
+    try:
+        with open(USERS_FILE, 'w') as f:
+            json.dump(users_data, f, indent=4)
+    except Exception as e:
+        print(f"Warning: Could not save users: {e}")
 
 def get_user_by_id(user_id):
     return users.get(str(user_id))
@@ -167,8 +170,11 @@ def load_user_data(user_id):
 
 def save_user_data(user_id, data):
     data_file = get_user_tracker_data_file(user_id)
-    with open(data_file, 'w') as f:
-        json.dump(data, f, indent=4)
+    try:
+        with open(data_file, 'w') as f:
+            json.dump(data, f, indent=4)
+    except Exception as e:
+        print(f"Warning: Could not save user data: {e}")
 
 def load_user_archived_chat_history(user_id):
     chat_file = get_user_chat_history_file(user_id)
@@ -180,8 +186,11 @@ def load_user_archived_chat_history(user_id):
 
 def save_user_archived_chat_history(user_id, history):
     chat_file = get_user_chat_history_file(user_id)
-    with open(chat_file, 'w') as f:
-        json.dump(history, f, indent=4)
+    try:
+        with open(chat_file, 'w') as f:
+            json.dump(history, f, indent=4)
+    except Exception as e:
+        print(f"Warning: Could not save chat history: {e}")
 
 # Global variables for current session chat (will be cleared on logout)
 current_session_chat = {}
