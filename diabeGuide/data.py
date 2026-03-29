@@ -9,11 +9,21 @@ from bson.objectid import ObjectId
 MONGODB_URI = os.getenv('MONGODB_URI')
 
 if MONGODB_URI:
-    client = MongoClient(MONGODB_URI)
-    db = client.get_database('diabeguide')
-    users_col = db.users
-    tracker_col = db.tracker_data
-    chat_col = db.chat_history
+    try:
+        # Add serverSelectionTimeoutMS to fail faster if the connection is wrong
+        client = MongoClient(MONGODB_URI, serverSelectionTimeoutMS=5000)
+        # Verify the connection
+        client.admin.command('ping')
+        db = client.get_database('diabeguide')
+        users_col = db.users
+        tracker_col = db.tracker_data
+        chat_col = db.chat_history
+        print("Successfully connected to MongoDB Atlas.")
+    except Exception as e:
+        print(f"ERROR: Could not connect to MongoDB: {e}")
+        users_col = None
+        tracker_col = None
+        chat_col = None
 else:
     # Fallback to empty mocks if not configured
     print("WARNING: MONGODB_URI not set. Data will not persist.")
