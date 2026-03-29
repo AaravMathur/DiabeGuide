@@ -48,7 +48,7 @@ class User(UserMixin):
         super().__setattr__(name, value)
         # Automatically update MongoDB if a profile field is changed
         profile_fields = ['weight', 'height', 'age', 'diabetes_type', 'email_verified', 'email']
-        if name in profile_fields and hasattr(self, 'id') and users_col:
+        if name in profile_fields and hasattr(self, 'id') and users_col is not None:
             try:
                 users_col.update_one({"_id": ObjectId(self.id)}, {"$set": {name: value}})
             except:
