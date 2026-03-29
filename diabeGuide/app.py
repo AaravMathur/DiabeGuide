@@ -24,7 +24,7 @@ def create_app():
     api_key = os.getenv("GEMINI_API_KEY")
     if api_key:
         genai.configure(api_key=api_key)
-        app.model = genai.GenerativeModel('gemini-1.5-flash-latest')
+        app.model = genai.GenerativeModel('gemini-1.5-flash')
     else:
         app.model = None # Handle case where API key is missing
 
