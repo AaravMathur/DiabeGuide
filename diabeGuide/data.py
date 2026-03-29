@@ -129,7 +129,7 @@ def get_user_by_username_or_email(identifier):
     return user
 
 def create_user(username, password_hash, email=None):
-    if not users_col:
+    if users_col is None:
         print("ERROR: create_user failed because users_col is None (DB connection failed).")
         return None
     
