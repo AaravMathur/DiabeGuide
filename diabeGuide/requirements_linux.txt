@@ -1,0 +1,9 @@
+Flask
+Flask-Login
+google-generativeai
+python-dotenv
+gunicorn
+requests
+google-api-python-client
+pydantic
+tqdm
