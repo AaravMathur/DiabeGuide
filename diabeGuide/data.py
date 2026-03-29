@@ -129,18 +129,31 @@ def get_user_by_username_or_email(identifier):
     return user
 
 def create_user(username, password_hash, email=None):
-    if not users_col: return None
-    if get_user_by_username(username) or (email and get_user_by_email(email)):
+    if not users_col:
+        print("ERROR: create_user failed because users_col is None (DB connection failed).")
+        return None
+    
+    if get_user_by_username(username):
+        print(f"ERROR: create_user failed because username '{username}' already exists.")
+        return None
+    
+    if email and get_user_by_email(email):
+        print(f"ERROR: create_user failed because email '{email}' already exists.")
         return None
 
-    user_doc = {
-        'username': username,
-        'password_hash': password_hash,
-        'email': email,
-        'email_verified': False
-    }
-    result = users_col.insert_one(user_doc)
-    return get_user_by_id(result.inserted_id)
+    try:
+        user_doc = {
+            'username': username,
+            'password_hash': password_hash,
+            'email': email,
+            'email_verified': False
+        }
+        result = users_col.insert_one(user_doc)
+        print(f"Successfully inserted user '{username}' into MongoDB.")
+        return get_user_by_id(result.inserted_id)
+    except Exception as e:
+        print(f"ERROR: MongoDB insert_one failed for user '{username}': {e}")
+        return None
 
 def save_users():
     # In MongoDB version, we update individual users, not the whole collection at once.
