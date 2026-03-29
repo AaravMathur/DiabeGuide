@@ -47,6 +47,9 @@ def chat():
         """
         print(f"Generated prompt: {prompt}")
 
+        if not current_app.model:
+            return jsonify({'error': 'Gemini model not initialized. Please check your GEMINI_API_KEY environment variable.'}), 500
+
         response = current_app.model.generate_content(prompt)
         print(f"Received response from Gemini: {response.text}")
 

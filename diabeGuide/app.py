@@ -21,8 +21,12 @@ def create_app():
         return get_user_by_id(user_id)
 
     # Configure the Gemini API
-    genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
-    app.model = genai.GenerativeModel('gemini-2.5-flash')
+    api_key = os.getenv("GEMINI_API_KEY")
+    if api_key:
+        genai.configure(api_key=api_key)
+        app.model = genai.GenerativeModel('gemini-1.5-flash')
+    else:
+        app.model = None # Handle case where API key is missing
 
     with app.app_context():
         # Import and register blueprints

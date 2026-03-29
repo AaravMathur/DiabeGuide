@@ -7,9 +7,12 @@ import os
 USER_DATA_DIR = 'diabeGuide/user_data'
 USERS_FILE = 'diabeGuide/users.json'
 
-# Ensure user data directory exists
-if not os.path.exists(USER_DATA_DIR):
-    os.makedirs(USER_DATA_DIR)
+# Ensure user data directory exists (ignore errors if on read-only filesystem)
+try:
+    if not os.path.exists(USER_DATA_DIR):
+        os.makedirs(USER_DATA_DIR)
+except Exception as e:
+    print(f"Warning: Could not create user data directory: {e}")
 
 # --- User Management ---
 class User(UserMixin):
