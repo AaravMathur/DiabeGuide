@@ -1,7 +1,5 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash
 from flask_login import login_required, current_user
-from ..data import save_users
-
 profile_bp = Blueprint('profile', __name__)
 
 @profile_bp.route('/profile', methods=['GET', 'POST'])
