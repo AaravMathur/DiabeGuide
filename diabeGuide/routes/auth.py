@@ -1,10 +1,10 @@
 from flask import Blueprint, render_template, redirect, url_for, flash, request, session, jsonify
 from flask_login import login_user, logout_user, login_required, current_user
+from werkzeug.security import generate_password_hash
 from ..data import get_user_by_username, create_user, get_user_by_id, get_user_by_email, get_user_by_username_or_email
 from ..utils.email_utils import generate_otp, send_otp_email
 import re
 from datetime import datetime, timedelta
-
 import logging
 
 auth_bp = Blueprint('auth', __name__)
@@ -16,16 +16,6 @@ def is_valid_email(email):
     """Validate email format"""
     pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
     return re.match(pattern, email) is not None
-
-from flask import Blueprint, render_template, redirect, url_for, flash, request, session, jsonify
-from flask_login import login_user, logout_user, login_required, current_user
-from werkzeug.security import generate_password_hash
-from ..data import get_user_by_username, create_user, get_user_by_id, get_user_by_email, get_user_by_username_or_email
-from ..utils.email_utils import generate_otp, send_otp_email
-import re
-from datetime import datetime, timedelta
-
-# ... (rest of the imports and setup)
 
 @auth_bp.route('/signup', methods=['GET', 'POST'])
 def signup():
@@ -53,8 +43,6 @@ def signup():
                 return render_template('signup.html', email=email, username=username, show_otp=True)
             
             if entered_otp == stored_otp:
-                # reload_users()
-                
                 # Final check for username/email existence
                 if get_user_by_username(username):
                     flash('That username has just been taken. Please choose another.', 'danger')
@@ -63,23 +51,19 @@ def signup():
                     flash('That email address has just been registered. Please use another.', 'danger')
                     return render_template('signup.html', username=username, show_otp=False)
                 
-                # Create user with pre-hashed password
+                # Create user in MongoDB
                 new_user = create_user(username, password_hash, email=email)
                 if new_user:
                     new_user.email_verified = True
-                    # from ..data import save_users
-                    # save_users()
-                    
                     # Log in the new user
                     login_user(new_user, remember=True)
                     session.clear()
                     flash('Account created successfully! Welcome to DiabeGuide!', 'success')
                     return redirect(url_for('welcome.welcome'))
                 else:
-                    flash('An unexpected error occurred while creating your account.', 'danger')
+                    flash('An unexpected error occurred while creating your account. Please check your DB connection.', 'danger')
                     return redirect(url_for('auth.signup'))
             else:
-                # Invalidate OTP on failed attempt
                 session.pop('signup_otp', None)
                 session.pop('signup_otp_expiry', None)
                 flash('Invalid OTP. Please request a new one.', 'danger')
@@ -99,7 +83,6 @@ def signup():
                 flash('Please enter a valid email address.', 'danger')
                 return render_template('signup.html', username=username, email=email, show_otp=False)
             
-            # reload_users()
             if get_user_by_username(username):
                 flash('Username already exists.', 'danger')
                 return render_template('signup.html', email=email, show_otp=False)
@@ -107,9 +90,7 @@ def signup():
                 flash('Email already registered.', 'danger')
                 return render_template('signup.html', username=username, show_otp=False)
             
-            # Hash password before storing in session
             password_hash = generate_password_hash(password)
-            
             otp = generate_otp()
             if send_otp_email(email, otp):
                 session['signup_email'] = email
@@ -128,21 +109,16 @@ def signup():
 
 @auth_bp.route('/resend_otp', methods=['POST'])
 def resend_otp():
-    """Resend OTP via AJAX"""
     email = session.get('signup_email')
-    
     if not email:
-        return jsonify({'success': False, 'error': 'Session expired. Please refresh and try again.'}), 400
-    
-    # Generate new OTP
+        return jsonify({'success': False, 'error': 'Session expired.'}), 400
     otp = generate_otp()
     if send_otp_email(email, otp):
         session['signup_otp'] = otp
         session['signup_otp_expiry'] = (datetime.now() + timedelta(minutes=10)).isoformat()
-        # Don't flash here as it won't be displayed on an AJAX request
         return jsonify({'success': True})
     else:
-        return jsonify({'success': False, 'error': 'Error sending OTP. Please try again later.'}), 500
+        return jsonify({'success': False, 'error': 'Error sending OTP.'}), 500
 
 @auth_bp.route('/login', methods=['GET', 'POST'])
 def login():
@@ -150,27 +126,15 @@ def login():
         return redirect(url_for('dashboard.dashboard'))
 
     if request.method == 'POST':
-        identifier = request.form.get('username_or_email')  # Changed field name
+        identifier = request.form.get('username_or_email')
         password = request.form.get('password')
-
-        # Reload users not needed for MongoDB
-        # reload_users()
-        
-        # Try to get user by username or email
         user = get_user_by_username_or_email(identifier)
         
         if user and user.check_password(password):
             login_user(user, remember=True)
-            flash('Logged in successfully!', 'success')
-            
-            # Check if profile is complete, if not redirect to welcome page
-            profile_complete = user.is_profile_complete()
-            if not profile_complete:
-                flash('Welcome! Please complete your profile to get started.', 'info')
+            if not user.is_profile_complete():
                 return redirect(url_for('welcome.welcome'))
-            
-            next_page = request.args.get('next')
-            return redirect(next_page or url_for('dashboard.dashboard'))
+            return redirect(url_for('dashboard.dashboard'))
         else:
             flash('Invalid username/email or password', 'danger')
 
@@ -180,5 +144,4 @@ def login():
 @login_required
 def logout():
     logout_user()
-    flash('You have been logged out.', 'info')
     return redirect(url_for('auth.login'))
