@@ -25,19 +25,28 @@ def create_app():
     if api_key:
         try:
             genai.configure(api_key=api_key)
-            # Debug: List available models to Vercel logs
-            print("Listing available Gemini models:")
-            for m in genai.list_models():
-                if 'generateContent' in m.supported_generation_methods:
-                    print(f"Model found: {m.name}")
             
-            app.model = genai.GenerativeModel('gemini-1.5-flash')
-            print("Gemini model initialized: gemini-1.5-flash")
+            # Smart Model Selection
+            available_models = [m.name for m in genai.list_models() if 'generateContent' in m.supported_generation_methods]
+            print(f"Available models: {available_models}")
+            
+            # Prefer 1.5 flash, then pro, then whatever is available
+            if 'models/gemini-1.5-flash' in available_models:
+                model_name = 'gemini-1.5-flash'
+            elif 'models/gemini-pro' in available_models:
+                model_name = 'gemini-pro'
+            elif available_models:
+                # Use the first available model name (removing the 'models/' prefix)
+                model_name = available_models[0].replace('models/', '')
+            else:
+                model_name = 'gemini-1.5-flash' # Default fallback
+                
+            app.model = genai.GenerativeModel(model_name)
+            print(f"Gemini model initialized: {model_name}")
         except Exception as e:
             print(f"ERROR: Gemini initialization failed: {e}")
             app.model = None
     else:
-        print("WARNING: GEMINI_API_KEY not set.")
         app.model = None
 
     with app.app_context():
