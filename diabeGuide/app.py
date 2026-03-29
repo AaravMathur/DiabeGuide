@@ -23,10 +23,22 @@ def create_app():
     # Configure the Gemini API
     api_key = os.getenv("GEMINI_API_KEY")
     if api_key:
-        genai.configure(api_key=api_key)
-        app.model = genai.GenerativeModel('models/gemini-1.5-flash')
+        try:
+            genai.configure(api_key=api_key)
+            # Debug: List available models to Vercel logs
+            print("Listing available Gemini models:")
+            for m in genai.list_models():
+                if 'generateContent' in m.supported_generation_methods:
+                    print(f"Model found: {m.name}")
+            
+            app.model = genai.GenerativeModel('gemini-1.5-flash')
+            print("Gemini model initialized: gemini-1.5-flash")
+        except Exception as e:
+            print(f"ERROR: Gemini initialization failed: {e}")
+            app.model = None
     else:
-        app.model = None # Handle case where API key is missing
+        print("WARNING: GEMINI_API_KEY not set.")
+        app.model = None
 
     with app.app_context():
         # Import and register blueprints
