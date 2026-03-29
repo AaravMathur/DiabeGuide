@@ -2,22 +2,29 @@ import json
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
 import os
+from pymongo import MongoClient
+from bson.objectid import ObjectId
 
-# Base directories for user-specific data
-USER_DATA_DIR = 'diabeGuide/user_data'
-USERS_FILE = 'diabeGuide/users.json'
+# Get MongoDB URI from environment variable
+MONGODB_URI = os.getenv('MONGODB_URI')
 
-# Ensure user data directory exists (ignore errors if on read-only filesystem)
-try:
-    if not os.path.exists(USER_DATA_DIR):
-        os.makedirs(USER_DATA_DIR)
-except Exception as e:
-    print(f"Warning: Could not create user data directory: {e}")
+if MONGODB_URI:
+    client = MongoClient(MONGODB_URI)
+    db = client.get_database('diabeguide')
+    users_col = db.users
+    tracker_col = db.tracker_data
+    chat_col = db.chat_history
+else:
+    # Fallback to empty mocks if not configured
+    print("WARNING: MONGODB_URI not set. Data will not persist.")
+    users_col = None
+    tracker_col = None
+    chat_col = None
 
 # --- User Management ---
 class User(UserMixin):
     def __init__(self, id, username, password_hash, email=None, weight=None, height=None, age=None, diabetes_type=None, email_verified=False):
-        self.id = id
+        self.id = str(id)
         self.username = username
         self.password_hash = password_hash
         self.email = email
@@ -27,170 +34,146 @@ class User(UserMixin):
         self.diabetes_type = diabetes_type
         self.email_verified = email_verified
 
+    def __setattr__(self, name, value):
+        super().__setattr__(name, value)
+        # Automatically update MongoDB if a profile field is changed
+        profile_fields = ['weight', 'height', 'age', 'diabetes_type', 'email_verified', 'email']
+        if name in profile_fields and hasattr(self, 'id') and users_col:
+            try:
+                users_col.update_one({"_id": ObjectId(self.id)}, {"$set": {name: value}})
+            except:
+                pass
+
     def get_id(self):
-        return str(self.id)
+        return self.id
 
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
     
     def is_profile_complete(self):
-        """Check if user profile is complete (has weight, height, age, and diabetes_type)"""
-        # Check if all required fields are filled (not None, not empty string)
+        """Check if user profile is complete"""
         weight_ok = self.weight is not None and str(self.weight).strip() != ''
         height_ok = self.height is not None and str(self.height).strip() != ''
         age_ok = self.age is not None and str(self.age).strip() != ''
         diabetes_type_ok = self.diabetes_type is not None and str(self.diabetes_type).strip() != ''
-        
         return weight_ok and height_ok and age_ok and diabetes_type_ok
 
-# In-memory storage for users for now
-users = {}
-next_user_id = 1
-
-def load_users():
-    global users, next_user_id
-    try:
-        with open(USERS_FILE, 'r') as f:
-            users_data = json.load(f)
-            users.clear()  # Clear existing users to avoid duplicates
-            for user_id, user_info in users_data.items():
-                # Handle None, empty string, or missing values
-                weight = user_info.get('weight')
-                height = user_info.get('height')
-                age = user_info.get('age')
-                diabetes_type = user_info.get('diabetes_type')
-                
-                # Convert empty strings to None
-                if weight == '':
-                    weight = None
-                if height == '':
-                    height = None
-                if age == '':
-                    age = None
-                if diabetes_type == '':
-                    diabetes_type = None
-                
-                email = user_info.get('email')
-                email_verified = user_info.get('email_verified', False)
-                if email == '':
-                    email = None
-                
-                users[user_id] = User(
-                    user_id,
-                    user_info['username'],
-                    user_info['password_hash'],
-                    email,
-                    weight,
-                    height,
-                    age,
-                    diabetes_type,
-                    email_verified
-                )
-            if users:
-                next_user_id = max([int(uid) for uid in users.keys()]) + 1
-    except (FileNotFoundError, json.JSONDecodeError):
-        users = {}
-        next_user_id = 1
-
-def save_users():
-    users_data = {}
-    for user in users.values():
-        users_data[user.id] = {
-            'username': user.username,
-            'password_hash': user.password_hash,
-            'email': user.email,
-            'weight': user.weight,
-            'height': user.height,
-            'age': user.age,
-            'diabetes_type': user.diabetes_type,
-            'email_verified': user.email_verified
-        }
-    try:
-        with open(USERS_FILE, 'w') as f:
-            json.dump(users_data, f, indent=4)
-    except Exception as e:
-        print(f"Warning: Could not save users: {e}")
-
 def get_user_by_id(user_id):
-    return users.get(str(user_id))
+    if not users_col: return None
+    try:
+        user_data = users_col.find_one({"_id": ObjectId(user_id)})
+        if user_data:
+            return User(
+                user_data['_id'],
+                user_data['username'],
+                user_data['password_hash'],
+                user_data.get('email'),
+                user_data.get('weight'),
+                user_data.get('height'),
+                user_data.get('age'),
+                user_data.get('diabetes_type'),
+                user_data.get('email_verified', False)
+            )
+    except:
+        pass
+    return None
 
 def get_user_by_username(username):
-    for user in users.values():
-        if user.username == username:
-            return user
+    if not users_col: return None
+    user_data = users_col.find_one({"username": username})
+    if user_data:
+        return User(
+            user_data['_id'],
+            user_data['username'],
+            user_data['password_hash'],
+            user_data.get('email'),
+            user_data.get('weight'),
+            user_data.get('height'),
+            user_data.get('age'),
+            user_data.get('diabetes_type'),
+            user_data.get('email_verified', False)
+        )
     return None
 
 def get_user_by_email(email):
-    for user in users.values():
-        if user.email and user.email.lower() == email.lower():
-            return user
+    if not users_col: return None
+    user_data = users_col.find_one({"email": email})
+    if user_data:
+        return User(
+            user_data['_id'],
+            user_data['username'],
+            user_data['password_hash'],
+            user_data.get('email'),
+            user_data.get('weight'),
+            user_data.get('height'),
+            user_data.get('age'),
+            user_data.get('diabetes_type'),
+            user_data.get('email_verified', False)
+        )
     return None
 
 def get_user_by_username_or_email(identifier):
-    """Get user by username or email"""
     user = get_user_by_username(identifier)
     if not user:
         user = get_user_by_email(identifier)
     return user
 
-def reload_users():
-    """Reload users from file - call this when user data might have changed"""
-    load_users()
-
 def create_user(username, password_hash, email=None):
-    global next_user_id
-    if get_user_by_username(username):
-        return None # User already exists
-    if email and get_user_by_email(email):
-        return None # Email already exists
+    if not users_col: return None
+    if get_user_by_username(username) or (email and get_user_by_email(email)):
+        return None
 
-    user = User(str(next_user_id), username, password_hash, email=email, email_verified=False)
-    users[user.id] = user
-    next_user_id += 1
-    save_users()
-    return user
+    user_doc = {
+        'username': username,
+        'password_hash': password_hash,
+        'email': email,
+        'email_verified': False
+    }
+    result = users_col.insert_one(user_doc)
+    return get_user_by_id(result.inserted_id)
 
-# Load users when the module is imported
-load_users()
+def save_users():
+    # In MongoDB version, we update individual users, not the whole collection at once.
+    # This function is kept for compatibility but is handled differently.
+    pass
+
+def reload_users():
+    # MongoDB handles data freshness automatically
+    pass
+
+# --- Profile Updates ---
+# We need a way to update user fields in MongoDB
+def update_user_profile(user_id, profile_data):
+    if not users_col: return False
+    users_col.update_one({"_id": ObjectId(user_id)}, {"$set": profile_data})
+    return True
 
 # --- User-specific Data Loading ---
-def get_user_tracker_data_file(user_id):
-    return os.path.join(USER_DATA_DIR, f'tracker_data_{user_id}.json')
-
-def get_user_chat_history_file(user_id):
-    return os.path.join(USER_DATA_DIR, f'chat_history_{user_id}.json')
-
 def load_user_data(user_id):
-    data_file = get_user_tracker_data_file(user_id)
-    try:
-        with open(data_file, 'r') as f:
-            return json.load(f)
-    except (FileNotFoundError, json.JSONDecodeError):
-        return {}
+    if not tracker_col: return {}
+    data = tracker_col.find_one({"user_id": str(user_id)})
+    return data.get('data', {}) if data else {}
 
 def save_user_data(user_id, data):
-    data_file = get_user_tracker_data_file(user_id)
-    try:
-        with open(data_file, 'w') as f:
-            json.dump(data, f, indent=4)
-    except Exception as e:
-        print(f"Warning: Could not save user data: {e}")
+    if not tracker_col: return
+    tracker_col.update_one(
+        {"user_id": str(user_id)},
+        {"$set": {"data": data}},
+        upsert=True
+    )
 
 def load_user_archived_chat_history(user_id):
-    chat_file = get_user_chat_history_file(user_id)
-    try:
-        with open(chat_file, 'r') as f:
-            return json.load(f)
-    except (FileNotFoundError, json.JSONDecodeError):
-        return []
+    if not chat_col: return []
+    data = chat_col.find_one({"user_id": str(user_id)})
+    return data.get('history', []) if data else []
 
 def save_user_archived_chat_history(user_id, history):
-    chat_file = get_user_chat_history_file(user_id)
-    try:
-        with open(chat_file, 'w') as f:
-            json.dump(history, f, indent=4)
-    except Exception as e:
-        print(f"Warning: Could not save chat history: {e}")
+    if not chat_col: return
+    chat_col.update_one(
+        {"user_id": str(user_id)},
+        {"$set": {"history": history}},
+        upsert=True
+    )
 
 # Global variables for current session chat (will be cleared on logout)
 current_session_chat = {}
