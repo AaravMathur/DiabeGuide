@@ -4,6 +4,8 @@
   "version": "0.0.1",
   "type": "module",
   "scripts": {
+    "predeploy": "pnpm run build",
+    "deploy": "gh-pages -d dist",
     "build": "vite build",
     "dev": "concurrently \"vite\" \"pnpm --prefix backend run dev\""
   },
@@ -68,6 +70,7 @@
     "@tailwindcss/vite": "4.1.12",
     "@vitejs/plugin-react": "4.7.0",
     "concurrently": "^10.0.3",
+    "gh-pages": "^6.3.0",
     "tailwindcss": "4.1.12",
     "vite": "6.3.5"
   },
