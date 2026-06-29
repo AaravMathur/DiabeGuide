@@ -1,0 +1,399 @@
+@custom-variant dark (&:is(.dark *));
+
+:root {
+  --font-size: 16px;
+  --background: #F8FAFC;
+  --foreground: oklch(0.145 0 0);
+  --card: #FFFFFF;
+  --card-foreground: oklch(0.145 0 0);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.145 0 0);
+  --primary: #2563EB;
+  --primary-foreground: #FFFFFF;
+  --secondary: #06B6D4;
+  --secondary-foreground: #FFFFFF;
+  --muted: #F8FAFC;
+  --muted-foreground: #64748B;
+  --accent: #10B981;
+  --accent-foreground: #FFFFFF;
+  --destructive: #EF4444;
+  --destructive-foreground: #FFFFFF;
+  --border: rgba(0, 0, 0, 0.1);
+  --input: transparent;
+  --input-background: #F8FAFC;
+  --switch-background: #E2E8F0;
+  --font-weight-medium: 500;
+  --font-weight-normal: 400;
+  --ring: #2563EB;
+  --chart-1: #2563EB;
+  --chart-2: #06B6D4;
+  --chart-3: #10B981;
+  --chart-4: #F59E0B;
+  --chart-5: #EF4444;
+  --radius: 1rem;
+  --sidebar: #FFFFFF;
+  --sidebar-foreground: oklch(0.145 0 0);
+  --sidebar-primary: #2563EB;
+  --sidebar-primary-foreground: #FFFFFF;
+  --sidebar-accent: #F8FAFC;
+  --sidebar-accent-foreground: oklch(0.205 0 0);
+  --sidebar-border: #E2E8F0;
+  --sidebar-ring: #2563EB;
+}
+
+.dark {
+  --background: oklch(0.145 0 0);
+  --foreground: oklch(0.985 0 0);
+  --card: oklch(0.145 0 0);
+  --card-foreground: oklch(0.985 0 0);
+  --popover: oklch(0.145 0 0);
+  --popover-foreground: oklch(0.985 0 0);
+  --primary: oklch(0.985 0 0);
+  --primary-foreground: oklch(0.205 0 0);
+  --secondary: oklch(0.269 0 0);
+  --secondary-foreground: oklch(0.985 0 0);
+  --muted: oklch(0.269 0 0);
+  --muted-foreground: oklch(0.708 0 0);
+  --accent: oklch(0.269 0 0);
+  --accent-foreground: oklch(0.985 0 0);
+  --destructive: oklch(0.396 0.141 25.723);
+  --destructive-foreground: oklch(0.637 0.237 25.331);
+  --border: oklch(0.269 0 0);
+  --input: oklch(0.269 0 0);
+  --ring: oklch(0.439 0 0);
+  --font-weight-medium: 500;
+  --font-weight-normal: 400;
+  --chart-1: oklch(0.488 0.243 264.376);
+  --chart-2: oklch(0.696 0.17 162.48);
+  --chart-3: oklch(0.769 0.188 70.08);
+  --chart-4: oklch(0.627 0.265 303.9);
+  --chart-5: oklch(0.645 0.246 16.439);
+  --sidebar: oklch(0.205 0 0);
+  --sidebar-foreground: oklch(0.985 0 0);
+  --sidebar-primary: oklch(0.488 0.243 264.376);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.269 0 0);
+  --sidebar-accent-foreground: oklch(0.985 0 0);
+  --sidebar-border: oklch(0.269 0 0);
+  --sidebar-ring: oklch(0.439 0 0);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-input-background: var(--input-background);
+  --color-switch-background: var(--switch-background);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+  }
+
+  /**
+  * Default typography styles for HTML elements (h1-h4, p, label, button, input).
+  * These are in @layer base, so Tailwind utility classes (like text-sm, text-lg) automatically override them.
+  */
+
+  html {
+    font-size: var(--font-size);
+  }
+
+  h1 {
+    font-size: var(--text-2xl);
+    font-weight: var(--font-weight-medium);
+    line-height: 1.5;
+  }
+
+  h2 {
+    font-size: var(--text-xl);
+    font-weight: var(--font-weight-medium);
+    line-height: 1.5;
+  }
+
+  h3 {
+    font-size: var(--text-lg);
+    font-weight: var(--font-weight-medium);
+    line-height: 1.5;
+  }
+
+  h4 {
+    font-size: var(--text-base);
+    font-weight: var(--font-weight-medium);
+    line-height: 1.5;
+  }
+
+  label {
+    font-size: var(--text-base);
+    font-weight: var(--font-weight-medium);
+    line-height: 1.5;
+  }
+
+  button {
+    font-size: var(--text-base);
+    font-weight: var(--font-weight-medium);
+    line-height: 1.5;
+  }
+
+  input {
+    font-size: var(--text-base);
+    font-weight: var(--font-weight-normal);
+    line-height: 1.5;
+  }
+}
+
+@keyframes bell-ring {
+  0% { transform: rotate(0); }
+  10% { transform: rotate(15deg); }
+  20% { transform: rotate(-15deg); }
+  30% { transform: rotate(10deg); }
+  40% { transform: rotate(-10deg); }
+  50% { transform: rotate(5deg); }
+  60% { transform: rotate(-5deg); }
+  70% { transform: rotate(0); }
+  100% { transform: rotate(0); }
+}
+
+.animate-bell-ring {
+  animation: bell-ring 1.2s ease-in-out infinite;
+  transform-origin: top center;
+}
+
+/* Dark mode overrides for default Tailwind utility classes */
+.dark .text-gray-900, 
+.dark .text-slate-900,
+.dark h1, .dark h2, .dark h3, .dark h4 {
+  color: var(--foreground) !important;
+}
+
+.dark .text-gray-800, 
+.dark .text-slate-800 {
+  color: oklch(0.9 0 0) !important;
+}
+
+.dark .text-gray-700, 
+.dark .text-slate-700 {
+  color: oklch(0.8 0 0) !important;
+}
+
+.dark .text-gray-600, 
+.dark .text-slate-600,
+.dark .text-gray-500,
+.dark .text-slate-500 {
+  color: var(--muted-foreground) !important;
+}
+
+.dark .bg-white {
+  background-color: var(--card) !important;
+}
+
+.dark .bg-gray-50, 
+.dark .bg-slate-50 {
+  background-color: var(--background) !important;
+}
+
+.dark .bg-gray-100, 
+.dark .bg-slate-100 {
+  background-color: oklch(0.2 0 0) !important;
+}
+
+.dark .border-gray-200, 
+.dark .border-slate-200,
+.dark .border-gray-100, 
+.dark .border-slate-100 {
+  border-color: var(--border) !important;
+}
+
+.dark .hover\:bg-gray-100:hover, 
+.dark .hover\:bg-slate-100:hover,
+.dark .hover\:bg-gray-50:hover {
+  background-color: oklch(0.2 0 0) !important;
+}
+
+/* Specific component light-colored card backgrounds */
+.dark .bg-blue-50 {
+  background-color: rgba(37, 99, 235, 0.15) !important;
+}
+.dark .text-blue-600 {
+  color: oklch(0.7 0.15 250) !important;
+}
+
+.dark .bg-emerald-50 {
+  background-color: rgba(16, 185, 129, 0.15) !important;
+}
+.dark .text-emerald-600 {
+  color: oklch(0.75 0.15 140) !important;
+}
+
+.dark .bg-purple-50 {
+  background-color: rgba(139, 92, 246, 0.15) !important;
+}
+.dark .text-purple-600 {
+  color: oklch(0.75 0.15 290) !important;
+}
+
+.dark .border-blue-100,
+.dark .border-emerald-100,
+.dark .border-purple-100,
+.dark .border-cyan-100,
+.dark .border-orange-100,
+.dark .border-blue-200,
+.dark .border-emerald-200,
+.dark .border-purple-200,
+.dark .border-cyan-200,
+.dark .border-orange-200 {
+  border-color: var(--border) !important;
+}
+
+.dark input, .dark select, .dark textarea {
+  color: var(--foreground) !important;
+  background-color: oklch(0.2 0 0) !important;
+  border-color: var(--border) !important;
+}
+
+.dark label {
+  color: var(--foreground) !important;
+}
+
+/* Gradients in dark mode */
+.dark .bg-gradient-to-br.from-blue-50 {
+  background-image: linear-gradient(to bottom right, oklch(0.12 0 0), oklch(0.15 0.02 240), oklch(0.12 0 0)) !important;
+}
+.dark .bg-gradient-to-b.from-blue-50 {
+  background-image: linear-gradient(to bottom, oklch(0.12 0 0), oklch(0.15 0 0)) !important;
+}
+.dark .bg-gradient-to-r.from-blue-100 {
+  background-image: linear-gradient(to right, rgba(37, 99, 235, 0.15), rgba(6, 182, 212, 0.15)) !important;
+}
+
+/* Opacity overlays in dark mode */
+.dark .bg-white\/90 {
+  background-color: rgba(20, 20, 20, 0.9) !important;
+}
+.dark .bg-white\/80 {
+  background-color: rgba(20, 20, 20, 0.8) !important;
+}
+
+/* Additional specific text colors */
+.dark .text-blue-700 {
+  color: oklch(0.8 0.15 250) !important;
+}
+.dark .text-blue-900 {
+  color: oklch(0.9 0.1 250) !important;
+}
+.dark .text-emerald-700 {
+  color: oklch(0.8 0.15 140) !important;
+}
+.dark .text-emerald-900 {
+  color: oklch(0.9 0.1 140) !important;
+}
+.dark .text-purple-700 {
+  color: oklch(0.8 0.15 290) !important;
+}
+.dark .text-purple-900 {
+  color: oklch(0.9 0.1 290) !important;
+}
+.dark .text-amber-600 {
+  color: oklch(0.75 0.15 80) !important;
+}
+.dark .text-amber-700 {
+  color: oklch(0.8 0.15 80) !important;
+}
+.dark .text-cyan-700 {
+  color: oklch(0.8 0.15 190) !important;
+}
+.dark .text-orange-700 {
+  color: oklch(0.75 0.18 50) !important;
+}
+.dark .text-orange-900 {
+  color: oklch(0.85 0.12 50) !important;
+}
+.dark .text-red-600 {
+  color: oklch(0.65 0.23 25) !important;
+}
+.dark .text-red-700 {
+  color: oklch(0.7 0.2 25) !important;
+}
+
+/* Badges styling in dark mode */
+.dark .bg-emerald-100 {
+  background-color: rgba(16, 185, 129, 0.15) !important;
+  color: oklch(0.8 0.15 140) !important;
+}
+.dark .bg-red-100 {
+  background-color: rgba(239, 68, 68, 0.15) !important;
+  color: oklch(0.75 0.15 25) !important;
+}
+.dark .bg-amber-100 {
+  background-color: rgba(245, 158, 11, 0.15) !important;
+  color: oklch(0.8 0.15 80) !important;
+}
+.dark .bg-blue-100 {
+  background-color: rgba(37, 99, 235, 0.15) !important;
+  color: oklch(0.8 0.15 250) !important;
+}
+.dark .bg-cyan-100 {
+  background-color: rgba(6, 182, 212, 0.15) !important;
+  color: oklch(0.8 0.15 190) !important;
+}
+
+/* Emergency page containers */
+.dark .bg-red-50 {
+  background-color: rgba(239, 68, 68, 0.1) !important;
+}
+.dark .bg-orange-50 {
+  background-color: rgba(245, 158, 11, 0.1) !important;
+}
+
+/* General grey lists background and borders */
+.dark .bg-gray-200,
+.dark .bg-gray-300 {
+  background-color: oklch(0.25 0 0) !important;
+}
+.dark circle[stroke="#e5e7eb"] {
+  stroke: oklch(0.25 0 0) !important;
+}
+
+/* Quick questions & helper hovers */
+.dark .hover\:bg-blue-100:hover {
+  background-color: rgba(37, 99, 235, 0.25) !important;
+}
+
