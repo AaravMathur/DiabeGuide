@@ -1,0 +1,15 @@
+# Environment variables
+.env
+
+# Python virtual environment
+venv/
+
+# Python cache
+__pycache__/
+
+# User data
+users.json
+user_data/
+flask.log
+chat_history.json
+tracker_data.json
