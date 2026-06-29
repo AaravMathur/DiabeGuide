@@ -11,6 +11,8 @@ import { EmergencyPage } from "./pages/EmergencyPage";
 import { ReportsPage } from "./pages/ReportsPage";
 import { NotFoundPage } from "./pages/NotFoundPage";
 
+const basename = window.location.pathname.startsWith("/DiabeGuide") ? "/DiabeGuide" : "/";
+
 export const router = createBrowserRouter([
   {
     path: "/",
@@ -40,4 +42,4 @@ export const router = createBrowserRouter([
     path: "*",
     Component: NotFoundPage,
   },
-]);
+], { basename });
